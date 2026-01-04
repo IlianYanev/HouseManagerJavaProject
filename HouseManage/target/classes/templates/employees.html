@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employees | House Manager</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .nav { margin-bottom: 2rem; }
+        .nav a { margin-right: 1rem; text-decoration: none; color: #3498db; font-weight: bold; }
+        .form-box { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+        input, select { padding: 0.5rem; margin-right: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #27ae60; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #eee; }
+        th { background: #ecf0f1; }
+    </style>
+</head>
+<body>
+<div class="nav">
+    <a href="/">Companies</a>
+    <a href="/employees">Employees</a>
+    <a href="/buildings">Buildings</a>
+    <a href="/apartments">Apartments</a>
+    <a href="/residents">Residents</a>
+    <a href="/pets">Pets</a>
+    <a href="/payments">Payments</a>
+</div>
+
+<h1>Employee Management</h1>
+
+<div class="form-box">
+    <h3>Add New Employee</h3>
+    <form action="/add-employee" method="post">
+        <input type="text" name="firstName" placeholder="First Name" required>
+        <input type="text" name="lastName" placeholder="Last Name" required>
+
+        <select name="companyId" required>
+            <option value="" disabled selected>Select Company</option>
+            <option th:each="company : ${companies}"
+                    th:value="${company.id}"
+                    th:text="${company.name}">
+            </option>
+        </select>
+
+        <button type="submit">Hire Employee</button>
+    </form>
+</div>
+
+<h3>Staff List</h3>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Company</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="emp : ${employees}">
+        <td th:text="${emp.id}"></td>
+        <td th:text="${emp.firstName + ' ' + emp.lastName}"></td>
+        <td th:text="${emp.company != null} ? ${emp.company.name} : 'Unemployed'"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

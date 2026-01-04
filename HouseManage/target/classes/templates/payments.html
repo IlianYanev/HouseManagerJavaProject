@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Payments | House Manager</title>
+    <style>
+        body { font-family: sans-serif; max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        .nav { margin-bottom: 2rem; }
+        .nav a { margin-right: 1rem; text-decoration: none; color: #3498db; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
+        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #eee; }
+        th { background: #ecf0f1; }
+        .pay-btn { background: #e67e22; color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; }
+        .paid-badge { color: #27ae60; font-weight: bold; background: #eafaf1; padding: 0.3rem 0.8rem; border-radius: 4px; border: 1px solid #27ae60; }
+    </style>
+</head>
+<body>
+<div class="nav">
+    <a href="/">Companies</a>
+    <a href="/employees">Employees</a>
+    <a href="/buildings">Buildings</a>
+    <a href="/apartments">Apartments</a>
+    <a href="/residents">Residents</a>
+    <a href="/pets">Pets</a>
+    <a href="/payments">Payments</a>
+</div>
+
+<h1>Monthly Fees & Payments</h1>
+
+<h3>Due This Month</h3>
+<table>
+    <thead>
+    <tr>
+        <th>Apartment</th>
+        <th>Building</th>
+        <th>Owner</th>
+        <th>Calculated Fee</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="apt : ${apartments}">
+        <td th:text="${'Apt ' + apt.number}"></td>
+        <td th:text="${apt.building != null} ? ${apt.building.address} : '-'"></td>
+        <td th:text="${apt.ownerName}"></td>
+        <td th:text="${fees.get(apt.id)} + ' BGN'"></td>
+        <td>
+            <form th:if="${!paidStatus.get(apt.id)}" action="/pay" method="post">
+                <input type="hidden" name="apartmentId" th:value="${apt.id}">
+                <input type="hidden" name="amount" th:value="${fees.get(apt.id)}">
+                <button type="submit" class="pay-btn">Pay Now</button>
+            </form>
+
+            <span th:if="${paidStatus.get(apt.id)}" class="paid-badge">
+                        &#10003; PAID
+                    </span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>Payment History</h3>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <th>Apartment</th>
+        <th>Amount</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="pay : ${paymentHistory}">
+        <td th:text="${pay.id}"></td>
+        <td th:text="${pay.paymentDate}"></td>
+        <td th:text="${pay.apartment != null} ? ${'Apt ' + pay.apartment.number} : '-'"></td>
+        <td th:text="${pay.amount} + ' BGN'"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

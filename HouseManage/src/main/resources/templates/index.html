@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Companies | House Manager</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .nav { margin-bottom: 2rem; }
+        .nav a { margin-right: 1rem; text-decoration: none; color: #3498db; font-weight: bold; }
+        h1 { color: #2c3e50; }
+        .form-box { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+        input { padding: 0.5rem; margin-right: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #27ae60; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #eee; }
+        th { background: #ecf0f1; }
+    </style>
+</head>
+<body>
+<div class="nav">
+    <a href="/">Companies</a>
+    <a href="/employees">Employees</a>
+    <a href="/buildings">Buildings</a>
+    <a href="/apartments">Apartments</a>
+    <a href="/residents">Residents</a>
+    <a href="/pets">Pets</a>
+    <a href="/payments">Payments</a>
+</div>
+
+<h1>Companies Management</h1>
+
+<div class="form-box">
+    <h3>Add New Company</h3>
+    <form action="/add-company" method="post">
+        <input type="text" name="name" placeholder="Company Name" required>
+        <input type="text" name="address" placeholder="Address" required>
+        <button type="submit">Add Company</button>
+    </form>
+</div>
+
+<h3>Registered Companies</h3>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Address</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="company : ${companies}">
+        <td th:text="${company.id}"></td>
+        <td th:text="${company.name}"></td>
+        <td th:text="${company.address}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
