@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Pets | House Manager</title>
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        .nav { margin-bottom: 2rem; }
+        .nav a { margin-right: 1rem; text-decoration: none; color: #3498db; font-weight: bold; }
+        .form-box { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+        input, select { padding: 0.5rem; margin-right: 0.5rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.5rem;}
+        button { background: #27ae60; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #eee; }
+        th { background: #ecf0f1; }
+    </style>
+</head>
+<body>
+<div class="nav">
+    <a href="/">Companies</a>
+    <a href="/employees">Employees</a>
+    <a href="/buildings">Buildings</a>
+    <a href="/apartments">Apartments</a>
+    <a href="/residents">Residents</a>
+    <a href="/pets">Pets</a>
+    <a href="/payments">Payments</a>
+    <a href="/reports" class="active"><i class="fas fa-chart-line"></i> Reports</a>
+</div>
+
+<h1>Pets Registry</h1>
+
+<div class="form-box">
+    <h3>Add New Pet</h3>
+    <form action="/add-pet" method="post">
+        <select name="apartmentId" required>
+            <option value="" disabled selected>Select Apartment</option>
+            <option th:each="apt : ${apartments}"
+                    th:value="${apt.id}"
+                    th:text="${'Apt ' + apt.number + ' (Floor ' + apt.floor + ')'}">
+            </option>
+        </select>
+        <br>
+        <input type="text" name="species" placeholder="Species (e.g. Dog, Cat)" required>
+
+        <label style="margin-left: 10px;">
+            <input type="checkbox" name="usesCommonParts"> Uses Common Parts
+        </label>
+        <br><br>
+
+        <button type="submit">Add Pet</button>
+    </form>
+</div>
+
+<h3>Pets List</h3>
+<table>
+    <thead>
+    <tr>
+        <th>Species</th>
+        <th>Uses Common Parts?</th>
+        <th>Apartment</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="pet : ${pets}">
+        <td th:text="${pet.species}"></td>
+        <td th:text="${pet.usesCommonParts} ? 'Yes' : 'No'"></td>
+        <td th:text="${pet.apartment != null} ? ${'Apt ' + pet.apartment.number} : 'No Home'"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

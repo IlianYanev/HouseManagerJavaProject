@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Buildings | House Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: sans-serif; max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        .nav { margin-bottom: 2rem; }
+        .nav a { margin-right: 1rem; text-decoration: none; color: #3498db; font-weight: bold; }
+        h1 { color: #2c3e50; }
+
+        .form-box { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+        .full-width { grid-column: span 4; }
+        .half-width { grid-column: span 2; }
+        input, select { padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; width: 90%; }
+        button.add-btn { background: #27ae60; color: white; border: none; padding: 0.7rem 1rem; border-radius: 4px; cursor: pointer; grid-column: span 4; justify-self: start; margin-top: 10px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
+        th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #eee; vertical-align: top; }
+        th { background: #ecf0f1; }
+
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 0 5px; }
+        .btn-edit { color: #f39c12; }
+        .btn-delete { color: #e74c3c; }
+        .btn-save { color: #27ae60; display: none; }
+
+        .edit-input { display: none; width: 80px; margin-bottom: 2px; }
+        .edit-select { display: none; width: 100%; }
+        .edit-text { display: none; width: 90%; }
+    </style>
+</head>
+<body>
+<div class="nav">
+    <a href="/">Companies</a>
+    <a href="/employees">Employees</a>
+    <a href="/buildings">Buildings</a>
+    <a href="/apartments">Apartments</a>
+    <a href="/residents">Residents</a>
+    <a href="/pets">Pets</a>
+    <a href="/payments">Payments</a>
+    <a href="/reports" class="active"><i class="fas fa-chart-line"></i> Reports</a>
+</div>
+
+<h1>Buildings Management</h1>
+
+<form action="/add-building" method="post" class="form-box">
+    <h3 class="full-width">Register New Building</h3>
+
+    <div class="half-width"><label>Address:</label><br><input type="text" name="address" required style="width: 95%;"></div>
+    <div class="half-width"><label>Manager:</label><br>
+        <select name="employeeId" style="width: 95%;">
+            <option value="" selected>-- Auto Assign --</option>
+            <option th:each="emp : ${employees}" th:value="${emp.id}" th:text="${emp.firstName + ' ' + emp.lastName + ' (' + (emp.company != null ? emp.company.name : 'No Co') + ')'}"></option>
+        </select>
+    </div>
+
+    <div><label>Floors:</label><br><input type="number" name="floors" value="1"></div>
+    <div><label>Apts:</label><br><input type="number" name="totalApartments" value="1"></div>
+    <div><label>Area (m2):</label><br><input type="number" step="0.01" name="area" value="0.00"></div>
+    <div><label>Common (m2):</label><br><input type="number" step="0.01" name="commonPartsArea" value="0.00"></div>
+
+    <div><label>Fee/m2:</label><br><input type="number" step="0.01" name="feePerSqm" value="0.00"></div>
+    <div><label>Elevator Fee:</label><br><input type="number" step="0.01" name="elevatorFee" value="0.00"></div>
+    <div><label>Pet Fee:</label><br><input type="number" step="0.01" name="petFee" value="0.00"></div>
+    <div></div>
+
+    <button type="submit" class="add-btn">Register Building</button>
+</form>
+
+<h3>Building List</h3>
+<table>
+    <thead>
+    <tr>
+        <th>Address</th>
+        <th>Stats (Floors/Apts/Area)</th>
+        <th>Fees (Sqm/Elev/Pet)</th>
+        <th>Manager</th>
+        <th style="width: 80px;">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="b : ${buildings}" th:id="'row-' + ${b.id}">
+        <td>
+            <span class="view-val" th:text="${b.address}"></span>
+            <input type="text" class="edit-text" name="address" th:value="${b.address}" th:form="'edit-form-' + ${b.id}" required>
+        </td>
+
+        <td>
+            <div class="view-val">
+                F: <span th:text="${b.floors}"></span> | A: <span th:text="${b.totalApartments}"></span><br>
+                Area: <span th:text="${b.area}"></span> | Com: <span th:text="${b.commonPartsArea}"></span>
+            </div>
+            <div class="edit-input-group" style="display:none;">
+                <label>F:</label> <input type="number" class="edit-input" name="floors" th:value="${b.floors}" th:form="'edit-form-' + ${b.id}" style="width: 50px;">
+                <label>A:</label> <input type="number" class="edit-input" name="totalApartments" th:value="${b.totalApartments}" th:form="'edit-form-' + ${b.id}" style="width: 50px;"><br>
+                <label>Ar:</label> <input type="number" step="0.01" class="edit-input" name="area" th:value="${b.area}" th:form="'edit-form-' + ${b.id}">
+                <label>Cm:</label> <input type="number" step="0.01" class="edit-input" name="commonPartsArea" th:value="${b.commonPartsArea}" th:form="'edit-form-' + ${b.id}">
+            </div>
+        </td>
+
+        <td>
+            <div class="view-val">
+                Sqm: <span th:text="${b.feePerSqm}"></span><br>
+                Elev: <span th:text="${b.elevatorFee}"></span> | Pet: <span th:text="${b.petFee}"></span>
+            </div>
+            <div class="edit-input-group" style="display:none;">
+                <label>Sqm:</label> <input type="number" step="0.01" class="edit-input" name="feePerSqm" th:value="${b.feePerSqm}" th:form="'edit-form-' + ${b.id}"><br>
+                <label>El:</label> <input type="number" step="0.01" class="edit-input" name="elevatorFee" th:value="${b.elevatorFee}" th:form="'edit-form-' + ${b.id}">
+                <label>Pet:</label> <input type="number" step="0.01" class="edit-input" name="petFee" th:value="${b.petFee}" th:form="'edit-form-' + ${b.id}">
+            </div>
+        </td>
+
+        <td>
+            <span class="view-val" th:text="${b.employee != null} ? ${b.employee.firstName + ' ' + b.employee.lastName} : 'No Manager'"></span>
+
+            <select class="edit-select" name="employeeId" th:form="'edit-form-' + ${b.id}">
+                <option value="" th:selected="${b.employee == null}">-- No Manager --</option>
+                <option th:each="emp : ${employees}"
+                        th:value="${emp.id}"
+                        th:text="${emp.firstName + ' ' + emp.lastName}"
+                        th:selected="${b.employee != null and b.employee.id == emp.id}">
+                </option>
+            </select>
+        </td>
+
+        <td>
+            <button type="button" class="action-btn btn-edit" th:onclick="'toggleEdit(' + ${b.id} + ')'">
+                <i class="fas fa-pencil-alt"></i>
+            </button>
+
+            <form th:id="'edit-form-' + ${b.id}" action="/edit-building" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${b.id}">
+                <button type="submit" class="action-btn btn-save">
+                    <i class="fas fa-save"></i>
+                </button>
+            </form>
+
+            <form action="/delete-building" method="post" style="display:inline;" onsubmit="return confirm('Deleting this building will delete ALL apartments and residents inside! Continue?');">
+                <input type="hidden" name="id" th:value="${b.id}">
+                <button type="submit" class="action-btn btn-delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    function toggleEdit(id) {
+        var row = document.getElementById('row-' + id);
+
+        row.querySelectorAll('.view-val').forEach(el => el.style.display = 'none');
+
+        row.querySelectorAll('.edit-input').forEach(el => el.style.display = 'inline-block');
+        row.querySelectorAll('.edit-text').forEach(el => el.style.display = 'inline-block');
+        row.querySelectorAll('.edit-select').forEach(el => el.style.display = 'inline-block');
+        row.querySelectorAll('.edit-input-group').forEach(el => el.style.display = 'block');
+
+        row.querySelector('.btn-edit').style.display = 'none';
+        row.querySelector('.btn-save').style.display = 'inline-block';
+    }
+</script>
+
+</body>
+</html>

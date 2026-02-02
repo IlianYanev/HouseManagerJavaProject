@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Companies | House Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        .nav { margin-bottom: 2rem; }
+        .nav a { margin-right: 1rem; text-decoration: none; color: #3498db; font-weight: bold; }
+        h1 { color: #2c3e50; }
+        .form-box { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+        input { padding: 0.5rem; margin-right: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #27ae60; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #eee; vertical-align: middle; }
+        th { background: #ecf0f1; }
+
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 0 5px; }
+        .btn-edit { color: #f39c12; }
+        .btn-delete { color: #e74c3c; }
+        .btn-save { color: #27ae60; display: none; }
+
+        .edit-input { display: none; width: 90%; }
+        .money { color: #27ae60; font-weight: bold; }
+
+        .sort-box {
+            background: #ecf0f1;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sort-label { font-weight: bold; color: #2c3e50; margin-right: 5px; }
+        .sort-link {
+            text-decoration: none;
+            color: #2c3e50;
+            background: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            border: 1px solid #bdc3c7;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .sort-link:hover {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+<div class="nav">
+    <a href="/">Companies</a>
+    <a href="/employees">Employees</a>
+    <a href="/buildings">Buildings</a>
+    <a href="/apartments">Apartments</a>
+    <a href="/residents">Residents</a>
+    <a href="/pets">Pets</a>
+    <a href="/payments">Payments</a>
+    <a href="/reports" class="active"><i class="fas fa-chart-line"></i> Reports</a>
+</div>
+
+<h1>Companies Management</h1>
+
+<div class="form-box">
+    <h3>Add New Company</h3>
+    <form action="/add-company" method="post">
+        <input type="text" name="name" placeholder="Company Name" required>
+        <input type="text" name="address" placeholder="Address" required>
+        <button type="submit">Add Company</button>
+    </form>
+</div>
+
+<div class="sort-box">
+    <span class="sort-label"><i class="fas fa-filter"></i> Sort by:</span>
+    <a href="/" class="sort-link">Default (ID)</a>
+    <a href="/?sortBy=revenue" class="sort-link"><i class="fas fa-coins"></i> Revenue (High to Low)</a>
+</div>
+
+<h3>Registered Companies</h3>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Address</th>
+        <th>Total Revenue</th>
+        <th style="width: 120px;">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="company : ${companies}" th:id="'row-' + ${company.id}">
+        <td th:text="${company.id}"></td>
+
+        <td>
+            <span class="view-val" th:text="${company.name}"></span>
+            <input type="text" class="edit-input" name="name" th:value="${company.name}" th:form="'edit-form-' + ${company.id}" required>
+        </td>
+
+        <td>
+            <span class="view-val" th:text="${company.address}"></span>
+            <input type="text" class="edit-input" name="address" th:value="${company.address}" th:form="'edit-form-' + ${company.id}" required>
+        </td>
+
+        <td class="money">
+            <span th:text="${revenueMap != null && revenueMap.containsKey(company.id) ? revenueMap.get(company.id) : '0.00'} + ' BGN'"></span>
+        </td>
+
+        <td>
+            <button type="button" class="action-btn btn-edit" th:onclick="'toggleEdit(' + ${company.id} + ')'">
+                <i class="fas fa-pencil-alt"></i>
+            </button>
+
+            <form th:id="'edit-form-' + ${company.id}" action="/edit-company" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${company.id}">
+                <button type="submit" class="action-btn btn-save">
+                    <i class="fas fa-save"></i>
+                </button>
+            </form>
+
+            <form action="/delete-company" method="post" style="display:inline;" onsubmit="return confirm('Are you sure? This will delete ALL related employees, buildings, and residents!');">
+                <input type="hidden" name="id" th:value="${company.id}">
+                <button type="submit" class="action-btn btn-delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    function toggleEdit(id) {
+        var row = document.getElementById('row-' + id);
+        var spans = row.querySelectorAll('.view-val');
+        var inputs = row.querySelectorAll('.edit-input');
+        var editBtn = row.querySelector('.btn-edit');
+        var saveBtn = row.querySelector('.btn-save');
+
+        spans.forEach(el => el.style.display = 'none');
+        inputs.forEach(el => el.style.display = 'inline-block');
+
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'inline-block';
+    }
+</script>
+
+</body>
+</html>
