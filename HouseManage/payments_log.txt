@@ -1,2 +1,0 @@
-DATE: 2026-01-02 | COMPANY: ZaFe | EMP: Ilian Yanev | BLDG: Sofia, Mladost 1 | APT: 2 | AMOUNT: 56.00
-DATE: 2026-01-02 | COMPANY: ZaFe | EMP: Ilian Yanev | BLDG: Sofia, Mladost 1 | APT: 6 | AMOUNT: 400.00
